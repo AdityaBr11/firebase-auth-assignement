@@ -5,6 +5,9 @@ export default {
   ],
   theme: {
     extend: {},
+    fontFamily:{
+      joseph:['Josefin Sans'],
+    }
   },
   plugins: [require("daisyui")],
 }

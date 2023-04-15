@@ -1,42 +1,108 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../useAuth";
+import { auth } from "../firebase/firebase";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { signOut } from "firebase/auth";
 
 const Navbar = () => {
+  const nav = useNavigate();
+  const Logout = () => {
+    signOut(auth)
+      .then(() => {
+        toast.success("Logout Success!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        setTimeout(() => {
+          nav("/");
+        }, 2000);
+      })
+      .catch((error) => {
+        toast.success(error, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      });
+  };
+
+  const currentUser = useAuth();
   return (
-    <div className="navbar bg-base-300 rounded-3xl w-[98%] mt-4 mx-auto">
-    <div className="flex-1">
-      <a className="btn btn-ghost normal-case text-xl">Firebase</a>
-    </div>
-    <div className="flex-none space-x-2">
-      <div className="dropdown dropdown-end">
-        <label tabIndex={0} className="btn btn-ghost btn-circle">
-          {/* <div className="indicator">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-          </div> */}
-          <Link to='/login'>
-          <p>login</p>
-          </Link>
-        </label>
+    <div className="navbar bg-base-300 rounded-3xl w-[98%] mt-4 mx-auto px-6">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      ></ToastContainer>
+      <div className="flex-1">
+        <Link to="/" className="btn btn-ghost normal-case text-xl">
+          Firebase
+        </Link>
       </div>
-      <div className="dropdown dropdown-end">
-        <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-          <div className="w-10 rounded-full">
-            <img src="https://media.licdn.com/dms/image/D4D03AQFnM3nl89RGEQ/profile-displayphoto-shrink_400_400/0/1675621936698?e=1686787200&v=beta&t=2IWdPUHbSyNhnbl3roJjePGHA6nBqa_u8XGcVmHq-e4" />
-          </div>
-        </label>
-        <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-300 rounded-box w-52">
-          <li>
-            <a className="justify-between">
-              Profile
-              <span className="badge">New</span>
-            </a>
-          </li>
-          <li><a>Settings</a></li>
-          <li><a>Logout</a></li>
-        </ul>
+      <div className="flex-none space-x-2">
+        {currentUser ? (
+          <>
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+                <div className="w-10 rounded-full">
+                  <img src="https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=" />
+                </div>
+              </label>
+              <ul
+                tabIndex={0}
+                className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-300 rounded-box w-52"
+              >
+                <li>
+                  <a className="justify-between capitalize">
+                    {currentUser.email.substring(
+                      0,
+                      currentUser.email.indexOf("@")
+                    )}
+                    <span className="badge">New</span>
+                  </a>
+                </li>
+                <li>
+                  <a>Settings</a>
+                </li>
+                <li>
+                  <a onClick={() => Logout()}>Logout</a>
+                </li>
+              </ul>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn btn-ghost btn-circle">
+                <Link to="/login">
+                  <p>login</p>
+                </Link>
+              </label>
+            </div>
+          </>
+        )}
       </div>
     </div>
-  </div>
   );
 };
 
